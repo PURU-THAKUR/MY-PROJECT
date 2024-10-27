@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>New Change Request</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css"/>
+</head>
+<body>
+    <div class="ui container">
+        <h1>New Change Request</h1>
+        <form class="ui form" method="POST">
+            <div class="field">
+                <label>Title</label>
+                <input type="text" name="title" required>
+            </div>
+            <div class="field">
+                <label>Description</label>
+                <textarea name="description" required></textarea>
+            </div>
+            <div class="field">
+                <label>Priority</label>
+                <select name="priority" class="ui dropdown" required>
+                    <option value="Low">Low</option>
+                    <option value="Medium">Medium</option>
+                    <option value="High">High</option>
+                </select>
+            </div>
+            <button class="ui button primary" type="submit">Submit</button>
+        </form>
+    </div>
+</body>
+</html>

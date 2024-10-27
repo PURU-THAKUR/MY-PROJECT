@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SCR System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css"/>
+</head>
+<body>
+    <div class="ui container">
+        <h1>Software Change Requests</h1>
+        <a href="/new" class="ui button primary">New Change Request</a>
+        <table class="ui celled table">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Description</th>
+                    <th>Priority</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for request in change_requests %}
+                <tr>
+                    <td>{{ request.title }}</td>
+                    <td>{{ request.description }}</td>
+                    <td>{{ request.priority }}</td>
+                    <td>{{ request.status }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
