@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Purushottam Kumar Thakur - Portfolio</title>
+
+    <style>
+        /* Reset */
+        * { margin: 0; padding: 0; box-sizing: border-box; scroll-behavior: smooth; }
+
+        /* Body */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: black;
+            color: white;
+            text-align: center;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Background Animation */
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+        }
+
+        /* Header */
+        header {
+            padding: 50px 0;
+            background: linear-gradient(90deg, #ff416c, #ff4b2b);
+            text-shadow: 2px 2px 10px black;
+        }
+
+        /* Sections */
+        .section {
+            width: 80%;
+            margin: 50px auto;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease-in-out;
+            cursor: pointer;
+        }
+
+        .section:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px #ff4b2b;
+        }
+
+        /* Interactive Coloring Effect */
+        .section.active {
+            background: linear-gradient(90deg, #00c6ff, #0072ff);
+            color: black;
+        }
+
+        /* Skills Hover + Click Effect */
+        .skill-list {
+            list-style: none;
+            padding: 20px;
+            display: none;
+        }
+
+        .skill-list li {
+            display: inline-block;
+            background: orange;
+            padding: 10px 20px;
+            margin: 10px;
+            border-radius: 5px;
+            font-size: 18px;
+            transition: all 0.3s ease-in-out;
+            opacity: 0;
+            transform: scale(0.8);
+        }
+
+        .skill-list li:hover {
+            transform: scale(1.2);
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .show-skills {
+            display: block !important;
+        }
+
+        .show-skills li {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        /* Contact Hover Reveal */
+        .contact-info {
+            display: none;
+        }
+
+        .hover-area:hover .contact-info {
+            display: block;
+        }
+
+        /* Footer */
+        footer {
+            padding: 20px;
+            background: black;
+            margin-top: 50px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Background Animation -->
+    <canvas id="bgCanvas"></canvas>
+
+    <header>
+        <h1>Purushottam Kumar Thakur</h1>
+        <p>Web Developer | Software Developer | Python Developer | Ethical Hacker</p>
+    </header>
+
+    <section class="section" onclick="toggleSection(this, 'about')">
+        <h2>About Me</h2>
+        <div id="about" class="content">
+            <p>I am a passionate developer specializing in Python, Web Development, AI/ML, and Cybersecurity...</p>
+        </div>
+    </section>
+
+    <section class="section" onclick="toggleSection(this, 'education')">
+        <h2>Education</h2>
+        <div id="education" class="content">
+            <p><strong>Diploma in Computer Science & Engineering</strong> (Graduation: August 2026)</p>
+            <p><strong>High School (Class 10)</strong> - Raj High School, Darbhanga (Graduation: March 2023)</p>
+        </div>
+    </section>
+
+    <section class="section" onclick="toggleSection(this, 'experience')">
+        <h2>Experience</h2>
+        <div id="experience" class="content">
+            <p><strong>Python Developer Intern</strong> - Brainwave Matrix Solutions (Jan 2025 - Feb 2025)</p>
+            <p><strong>Web Developer Intern</strong> - Sept 2024 - Nov 2024</p>
+        </div>
+    </section>
+
+    <section class="section" onclick="toggleSkills()">
+        <h2 id="skillTitle">Click to Show My Skills</h2>
+        <ul id="skills" class="skill-list">
+            <li>Python</li>
+            <li>Web Development</li>
+            <li>Software Development</li>
+            <li>AWS</li>
+            <li>Cybersecurity</li>
+            <li>AI/ML</li>
+        </ul>
+    </section>
+
+    <section class="section hover-area">
+        <h2>Contact Me</h2>
+        <div class="contact-info">
+            <p>Email: vinay1561988@gmail.com</p>
+            <p>Phone: +91 7488931590</p>
+            <p><a href="https://linkedin.com/in/purushottam-kumar-thakur-759a57302" target="_blank">LinkedIn</a></p>
+            <p><a href="https://github.com/PURU-THAKUR" target="_blank">GitHub</a></p>
+        </div>
+    </section>
+
+    <footer>
+        <p>© 2025 Purushottam Kumar Thakur | All Rights Reserved</p>
+    </footer>
+
+    <script>
+        function toggleSection(element, id) {
+            let section = document.getElementById(id);
+            if (section.style.display === "none" || section.style.display === "") {
+                section.style.display = "block";
+                element.classList.add("active");
+            } else {
+                section.style.display = "none";
+                element.classList.remove("active");
+            }
+        }
+
+        function toggleSkills() {
+            let skills = document.getElementById("skills");
+            let title = document.getElementById("skillTitle");
+            
+            if (skills.classList.contains("show-skills")) {
+                skills.classList.remove("show-skills");
+                title.innerText = "Click to Show My Skills";
+            } else {
+                skills.classList.add("show-skills");
+                title.innerText = "Tap Again to Hide Skills";
+            }
+        }
+
+        const canvas = document.getElementById("bgCanvas");
+        const ctx = canvas.getContext("2d");
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        let particles = [];
+        function createParticles() {
+            for (let i = 0; i < 100; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    radius: Math.random() * 5 + 1,
+                    dx: Math.random() * 2 - 1,
+                    dy: Math.random() * 2 - 1,
+                    color: `hsl(${Math.random() * 360}, 100%, 50%)`
+                });
+            }
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => {
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                ctx.fillStyle = p.color;
+                ctx.fill();
+                p.x += p.dx;
+                p.y += p.dy;
+                if (p.x < 0 || p.x > canvas.width) p.dx *= -1;
+                if (p.y < 0 || p.y > canvas.height) p.dy *= -1;
+            });
+            requestAnimationFrame(animateParticles);
+        }
+
+        createParticles();
+        animateParticles();
+    </script>
+
+</body>
+</html>
