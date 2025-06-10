@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital clock with glowing effect</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="wrapper">
+        <div class="display" id="time">12:00:00 PM</div>
+    </div>
+
+    <script>
+        setInterval(() => {
+            const time = document.querySelector('#time');
+            let date = new Date();
+            let hours = date.getHours();
+            let minutes = date.getMinutes();
+            let seconds = date.getSeconds();
+            let day_night = "AM";
+
+            if(hours >= 12){
+                day_night = "PM";
+                hours = hours - 12;
+            }
+
+            if(hours === 0){
+                hours = 12; // Convert midnight (0 hours) to 12
+            }
+
+            if(hours < 10){
+                hours = "0" + hours; // Add leading zero for single digit hours
+            }
+
+            if(minutes < 10){
+                minutes = "0" + minutes; // Add leading zero for single digit minutes
+            }
+
+            if(seconds < 10){
+                seconds = "0" + seconds; // Add leading zero for single digit seconds
+            }
+
+            time.textContent = hours + ":" + minutes + ":" + seconds + " " + day_night;
+        }, 1000); // Update every second (1000 milliseconds)
+    </script>
+</body>
+</html>
