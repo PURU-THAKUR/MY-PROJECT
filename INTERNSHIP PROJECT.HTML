@@ -1,0 +1,1606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Internship Project Dashboard</title>
+    <style>
+        /* Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        body {
+            background-color: #f0f2f5;
+            color: #333;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Milky Way Theme */
+        body.milky-way {
+            background: radial-gradient(ellipse at bottom, #1B2735 0%, #090A0F 100%);
+            color: #fff;
+        }
+
+        body.milky-way .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        body.milky-way .task-card {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        }
+
+        body.milky-way .task-card:hover {
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.57);
+            transform: translateY(-5px);
+        }
+
+        body.milky-way .theme-toggle {
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+        }
+
+        body.milky-way .start-button {
+            background: linear-gradient(45deg, #ff8a00, #e52e71);
+            box-shadow: 0 0 15px #ff8a00, 0 0 30px #e52e71;
+        }
+
+        body.milky-way .task-content {
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            background-color: #fff;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            position: relative;
+            margin-top: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(45deg, #4facfe, #00f2fe);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        body.milky-way .header h1 {
+            background: linear-gradient(45deg, #ff8a00, #e52e71);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 10px rgba(255, 138, 0, 0.5);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            color: #666;
+        }
+
+        body.milky-way .header p {
+            color: #ccc;
+        }
+
+        /* Theme Toggle */
+        .theme-toggle {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 50px;
+            background-color: #f0f2f5;
+            color: #333;
+            cursor: pointer;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            z-index: 100;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.05);
+        }
+
+        /* Start Button */
+        .start-button-container {
+            display: flex;
+            justify-content: center;
+            margin: 2rem 0;
+        }
+
+        .start-button {
+            padding: 1rem 2rem;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 50px;
+            background: linear-gradient(45deg, #4facfe, #00f2fe);
+            color: white;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .start-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .start-button:active {
+            transform: translateY(1px);
+        }
+
+        .start-button::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: rotate(45deg);
+            transition: all 0.5s ease;
+            opacity: 0;
+        }
+
+        .start-button:hover::before {
+            animation: shine 1.5s infinite;
+            opacity: 1;
+        }
+
+        @keyframes shine {
+            0% {
+                left: -100%;
+                top: -100%;
+            }
+            100% {
+                left: 100%;
+                top: 100%;
+            }
+        }
+
+        /* Task Dashboard */
+        .task-dashboard {
+            display: none;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .task-card {
+            background-color: #fff;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid #eee;
+        }
+
+        .task-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .task-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+            color: #4facfe;
+        }
+
+        body.milky-way .task-card h3 {
+            color: #ff8a00;
+        }
+
+        .task-card p {
+            color: #666;
+            margin-bottom: 1rem;
+        }
+
+        body.milky-way .task-card p {
+            color: #ccc;
+        }
+
+        .task-card .level {
+            display: inline-block;
+            padding: 0.2rem 0.5rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+
+        .task-card .beginner {
+            background-color: #e3f2fd;
+            color: #1976d2;
+        }
+
+        body.milky-way .task-card .beginner {
+            background-color: rgba(25, 118, 210, 0.2);
+            color: #bbdefb;
+        }
+
+        .task-card .intermediate {
+            background-color: #fff8e1;
+            color: #ff8f00;
+        }
+
+        body.milky-way .task-card .intermediate {
+            background-color: rgba(255, 143, 0, 0.2);
+            color: #ffe0b2;
+        }
+
+        .task-card .start-task-btn {
+            display: block;
+            width: 100%;
+            padding: 0.5rem;
+            background-color: #4facfe;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .task-card .start-task-btn:hover {
+            background-color: #3a8fd9;
+        }
+
+        body.milky-way .task-card .start-task-btn {
+            background: linear-gradient(45deg, #ff8a00, #e52e71);
+        }
+
+        body.milky-way .task-card .start-task-btn:hover {
+            background: linear-gradient(45deg, #e52e71, #ff8a00);
+        }
+
+        /* Task Content */
+        .task-content {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.95);
+            z-index: 1000;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        .task-content-inner {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: #fff;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+
+        .close-task-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #f44336;
+            color: white;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .close-task-btn:hover {
+            transform: rotate(90deg) scale(1.1);
+            background-color: #d32f2f;
+        }
+
+        .task-title {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: #4facfe;
+        }
+
+        body.milky-way .task-title {
+            color: #ff8a00;
+        }
+
+        .task-level {
+            display: inline-block;
+            padding: 0.3rem 1rem;
+            border-radius: 50px;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+        }
+
+        .task-objective {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        body.milky-way .task-objective {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .task-steps {
+            margin-bottom: 2rem;
+        }
+
+        .task-steps h3 {
+            margin-bottom: 1rem;
+            color: #4facfe;
+        }
+
+        body.milky-way .task-steps h3 {
+            color: #ff8a00;
+        }
+
+        .task-steps ol {
+            padding-left: 1.5rem;
+        }
+
+        .task-steps li {
+            margin-bottom: 0.5rem;
+            line-height: 1.6;
+        }
+
+        /* Task Implementation Area */
+        .task-implementation {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid #eee;
+        }
+
+        body.milky-way .task-implementation {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .task-implementation h3 {
+            margin-bottom: 1rem;
+            color: #4facfe;
+        }
+
+        body.milky-way .task-implementation h3 {
+            color: #ff8a00;
+        }
+
+        /* Task 1 Specific Styles */
+        .game-container {
+            background-color: #f9f9f9;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        body.milky-way .game-container {
+            background-color: rgba(0, 0, 0, 0.2);
+        }
+
+        .game-message {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            min-height: 60px;
+        }
+
+        .game-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .game-option {
+            padding: 0.8rem;
+            background-color: #4facfe;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .game-option:hover {
+            background-color: #3a8fd9;
+        }
+
+        body.milky-way .game-option {
+            background: linear-gradient(45deg, #ff8a00, #e52e71);
+        }
+
+        body.milky-way .game-option:hover {
+            background: linear-gradient(45deg, #e52e71, #ff8a00);
+        }
+
+        .game-score {
+            font-weight: bold;
+            margin-top: 1rem;
+        }
+
+        /* Task 2 Specific Styles */
+        .pattern-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 1rem;
+        }
+
+        .pattern-controls {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .pattern-select, .pattern-size {
+            padding: 0.5rem;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+
+        body.milky-way .pattern-select, 
+        body.milky-way .pattern-size {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .generate-pattern {
+            padding: 0.5rem 1rem;
+            background-color: #4facfe;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        body.milky-way .generate-pattern {
+            background: linear-gradient(45deg, #ff8a00, #e52e71);
+        }
+
+        .pattern-output {
+            font-family: monospace;
+            white-space: pre;
+            line-height: 1.2;
+            background-color: #f9f9f9;
+            padding: 1rem;
+            border-radius: 5px;
+            margin-top: 1rem;
+            max-width: 100%;
+            overflow-x: auto;
+        }
+
+        body.milky-way .pattern-output {
+            background-color: rgba(0, 0, 0, 0.2);
+        }
+
+        /* Task 3 Specific Styles */
+        .crud-container {
+            background-color: #f9f9f9;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        body.milky-way .crud-container {
+            background-color: rgba(0, 0, 0, 0.2);
+        }
+
+        .crud-form {
+            display: grid;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .crud-input {
+            padding: 0.8rem;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+
+        body.milky-way .crud-input {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .crud-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .crud-button {
+            padding: 0.8rem 1.5rem;
+            background-color: #4facfe;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        body.milky-way .crud-button {
+            background: linear-gradient(45deg, #ff8a00, #e52e71);
+        }
+
+        .task-list {
+            margin-top: 1.5rem;
+        }
+
+        .task-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        body.milky-way .task-item {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .task-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .edit-btn, .delete-btn {
+            padding: 0.3rem 0.6rem;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        .edit-btn {
+            background-color: #ffc107;
+            color: #333;
+        }
+
+        .delete-btn {
+            background-color: #f44336;
+            color: white;
+        }
+
+        /* Task 4 Specific Styles */
+        .temp-converter {
+            background-color: #f9f9f9;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        body.milky-way .temp-converter {
+            background-color: rgba(0, 0, 0, 0.2);
+        }
+
+        .converter-form {
+            display: grid;
+            gap: 1rem;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .temp-input, .conversion-select {
+            padding: 0.8rem;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+
+        body.milky-way .temp-input, 
+        body.milky-way .conversion-select {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .convert-btn {
+            padding: 0.8rem;
+            background-color: #4facfe;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        body.milky-way .convert-btn {
+            background: linear-gradient(45deg, #ff8a00, #e52e71);
+        }
+
+        .result-display {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background-color: #e3f2fd;
+            border-radius: 5px;
+            text-align: center;
+            font-size: 1.2rem;
+        }
+
+        body.milky-way .result-display {
+            background-color: rgba(25, 118, 210, 0.2);
+        }
+
+        /* Bonus Game */
+        .bonus-game {
+            display: none;
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px dashed #ccc;
+        }
+
+        body.milky-way .bonus-game {
+            border-top: 1px dashed rgba(255, 255, 255, 0.2);
+        }
+
+        .bonus-game h2 {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            color: #4facfe;
+        }
+
+        body.milky-way .bonus-game h2 {
+            color: #ff8a00;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+                margin-top: 1rem;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .task-dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            .game-options {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+
+        .task-card:nth-child(1) { animation-delay: 0.1s; }
+        .task-card:nth-child(2) { animation-delay: 0.2s; }
+        .task-card:nth-child(3) { animation-delay: 0.3s; }
+        .task-card:nth-child(4) { animation-delay: 0.4s; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <button class="theme-toggle" id="themeToggle">
+            <span>🌙</span> Milky Way Mode
+        </button>
+        
+        <div class="header">
+            <h1>Internship Project Dashboard</h1>
+            <p>Where Data Meets Intelligence</p>
+        </div>
+        
+        <div class="start-button-container">
+            <button class="start-button" id="startButton">Start Browser Tasks</button>
+        </div>
+        
+        <div class="task-dashboard" id="taskDashboard">
+            <!-- Task 1 -->
+            <div class="task-card fade-in" data-task="1">
+                <h3>Task 1: Text-Based Game</h3>
+                <span class="level beginner">Level 1: Beginner</span>
+                <p>Implement a simple game using conditional statements for game logic.</p>
+                <button class="start-task-btn">START TASK</button>
+            </div>
+            
+            <!-- Task 2 -->
+            <div class="task-card fade-in" data-task="2">
+                <h3>Task 2: Number Patterns</h3>
+                <span class="level beginner">Level 1: Beginner</span>
+                <p>Utilize loops to control the structure of number patterns.</p>
+                <button class="start-task-btn">START TASK</button>
+            </div>
+            
+            <!-- Task 3 -->
+            <div class="task-card fade-in" data-task="3">
+                <h3>Task 3: CRUD Operations</h3>
+                <span class="level intermediate">Level 2: Intermediate</span>
+                <p>Create a console application for basic CRUD operations on a list of tasks.</p>
+                <button class="start-task-btn">START TASK</button>
+            </div>
+            
+            <!-- Task 4 -->
+            <div class="task-card fade-in" data-task="4">
+                <h3>Task 4: Temperature Converter</h3>
+                <span class="level intermediate">Level 2: Intermediate</span>
+                <p>Enable users to input temperatures and choose the conversion direction.</p>
+                <button class="start-task-btn">START TASK</button>
+            </div>
+        </div>
+        
+        <!-- Bonus Game Section -->
+        <div class="bonus-game" id="bonusGame">
+            <h2>🎁 Bonus Challenge</h2>
+            <div class="task-card">
+                <h3>Memory Game</h3>
+                <p>Test your memory with this fun matching game!</p>
+                <button class="start-task-btn" id="startBonusGame">PLAY GAME</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Task 1 Content -->
+    <div class="task-content" id="task1Content">
+        <div class="task-content-inner">
+            <button class="close-task-btn" data-task="1">✕</button>
+            <h2 class="task-title">Task 1: Text-Based Game</h2>
+            <span class="task-level beginner">Level 1: Beginner</span>
+            
+            <div class="task-objective">
+                <strong>Objective:</strong> Implement a simple game using conditional statements for game logic.
+            </div>
+            
+            <div class="task-steps">
+                <h3>Steps:</h3>
+                <ol>
+                    <li>Choose a game type (quiz, guessing game).</li>
+                    <li>Define the game rules and logic.</li>
+                    <li>Use conditional statements to manage game flow.</li>
+                    <li>Test and debug the game for correctness.</li>
+                </ol>
+            </div>
+            
+            <div class="task-implementation">
+                <h3>Implementation: Quiz Game</h3>
+                <div class="game-container">
+                    <div class="game-message" id="gameMessage">Welcome to the Quiz Game! Click START to begin.</div>
+                    <div class="game-options" id="gameOptions" style="display: none;">
+                        <!-- Options will be inserted here by JavaScript -->
+                    </div>
+                    <button class="start-task-btn" id="startGame">START QUIZ</button>
+                    <div class="game-score" id="gameScore"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Task 2 Content -->
+    <div class="task-content" id="task2Content">
+        <div class="task-content-inner">
+            <button class="close-task-btn" data-task="2">✕</button>
+            <h2 class="task-title">Task 2: Number Patterns</h2>
+            <span class="task-level beginner">Level 1: Beginner</span>
+            
+            <div class="task-objective">
+                <strong>Objective:</strong> Utilize loops to control the structure of number patterns.
+            </div>
+            
+            <div class="task-steps">
+                <h3>Steps:</h3>
+                <ol>
+                    <li>Select a number pattern type (e.g., pyramid).</li>
+                    <li>Develop a program to generate the selected pattern.</li>
+                    <li>Use loops to control the structure of the pattern.</li>
+                    <li>Verify the correctness of the generated pattern.</li>
+                </ol>
+            </div>
+            
+            <div class="task-implementation">
+                <h3>Implementation: Pattern Generator</h3>
+                <div class="pattern-container">
+                    <div class="pattern-controls">
+                        <select class="pattern-select" id="patternSelect">
+                            <option value="pyramid">Pyramid</option>
+                            <option value="diamond">Diamond</option>
+                            <option value="square">Square</option>
+                            <option value="triangle">Right Triangle</option>
+                            <option value="numberPyramid">Number Pyramid</option>
+                        </select>
+                        
+                        <input type="number" class="pattern-size" id="patternSize" min="3" max="15" value="5" placeholder="Size">
+                        
+                        <button class="generate-pattern" id="generatePattern">Generate</button>
+                    </div>
+                    
+                    <div class="pattern-output" id="patternOutput">
+                        Select a pattern and click Generate
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Task 3 Content -->
+    <div class="task-content" id="task3Content">
+        <div class="task-content-inner">
+            <button class="close-task-btn" data-task="3">✕</button>
+            <h2 class="task-title">Task 3: CRUD Operations</h2>
+            <span class="task-level intermediate">Level 2: Intermediate</span>
+            
+            <div class="task-objective">
+                <strong>Objective:</strong> Implement Create, Read, Update, and Delete operations using arrays or lists for data storage.
+            </div>
+            
+            <div class="task-steps">
+                <h3>Steps:</h3>
+                <ol>
+                    <li>Define a Task class with necessary attributes.</li>
+                    <li>Implement functionality to create a new task.</li>
+                    <li>Develop a method to read and display tasks.</li>
+                    <li>Allow users to update task details.</li>
+                    <li>Provide an option to delete tasks.</li>
+                    <li>Test the application with various scenarios.</li>
+                </ol>
+            </div>
+            
+            <div class="task-implementation">
+                <h3>Implementation: Task Manager</h3>
+                <div class="crud-container">
+                    <div class="crud-form">
+                        <input type="text" class="crud-input" id="taskTitle" placeholder="Task title">
+                        <input type="text" class="crud-input" id="taskDescription" placeholder="Task description">
+                        <input type="hidden" id="taskId">
+                        
+                        <div class="crud-buttons">
+                            <button class="crud-button" id="addTask">Add Task</button>
+                            <button class="crud-button" id="updateTask" style="display: none;">Update Task</button>
+                            <button class="crud-button" id="cancelEdit" style="display: none;">Cancel</button>
+                        </div>
+                    </div>
+                    
+                    <div class="task-list" id="taskList">
+                        <!-- Tasks will be inserted here by JavaScript -->
+                        <p>No tasks added yet. Add your first task above!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Task 4 Content -->
+    <div class="task-content" id="task4Content">
+        <div class="task-content-inner">
+            <button class="close-task-btn" data-task="4">✕</button>
+            <h2 class="task-title">Task 4: Temperature Converter</h2>
+            <span class="task-level intermediate">Level 2: Intermediate</span>
+            
+            <div class="task-objective">
+                <strong>Objective:</strong> Enable users to input temperatures and choose the conversion direction between Fahrenheit and Celsius.
+            </div>
+            
+            <div class="task-steps">
+                <h3>Steps:</h3>
+                <ol>
+                    <li>Design a program to accept temperature input.</li>
+                    <li>Implement logic for temperature conversion.</li>
+                    <li>Allow users to choose the conversion direction.</li>
+                    <li>Test the program with different input values.</li>
+                </ol>
+            </div>
+            
+            <div class="task-implementation">
+                <h3>Implementation: Temperature Converter</h3>
+                <div class="temp-converter">
+                    <div class="converter-form">
+                        <input type="number" class="temp-input" id="tempInput" placeholder="Enter temperature">
+                        
+                        <select class="conversion-select" id="conversionSelect">
+                            <option value="cToF">Celsius to Fahrenheit</option>
+                            <option value="fToC">Fahrenheit to Celsius</option>
+                        </select>
+                        
+                        <button class="convert-btn" id="convertTemp">Convert</button>
+                    </div>
+                    
+                    <div class="result-display" id="tempResult">
+                        Result will appear here
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bonus Game Content -->
+    <div class="task-content" id="bonusGameContent">
+        <div class="task-content-inner">
+            <button class="close-task-btn" data-task="bonus">✕</button>
+            <h2 class="task-title">Bonus Game: Memory Challenge</h2>
+            
+            <div class="task-objective">
+                <strong>Objective:</strong> Test your memory by matching pairs of cards in this fun game!
+            </div>
+            
+            <div class="task-implementation">
+                <div class="memory-game-container">
+                    <div class="memory-game-controls">
+                        <div id="memoryScore">Matches: 0/8</div>
+                        <button class="start-task-btn" id="restartMemoryGame">Restart Game</button>
+                    </div>
+                    
+                    <div class="memory-game-board" id="memoryGameBoard">
+                        <!-- Cards will be inserted here by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const themeToggle = document.getElementById('themeToggle');
+        const startButton = document.getElementById('startButton');
+        const taskDashboard = document.getElementById('taskDashboard');
+        const bonusGame = document.getElementById('bonusGame');
+        
+        // Task Contents
+        const taskContents = {
+            1: document.getElementById('task1Content'),
+            2: document.getElementById('task2Content'),
+            3: document.getElementById('task3Content'),
+            4: document.getElementById('task4Content'),
+            bonus: document.getElementById('bonusGameContent')
+        };
+        
+        // Theme Toggle
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('milky-way');
+            
+            if (document.body.classList.contains('milky-way')) {
+                themeToggle.innerHTML = '<span>☀️</span> Light Mode';
+            } else {
+                themeToggle.innerHTML = '<span>🌙</span> Milky Way Mode';
+            }
+        });
+        
+        // Start Button - Show Tasks
+        startButton.addEventListener('click', () => {
+            startButton.style.display = 'none';
+            taskDashboard.style.display = 'grid';
+            bonusGame.style.display = 'block';
+            
+            // Add animation class to task cards
+            document.querySelectorAll('.task-card').forEach(card => {
+                card.classList.add('fade-in');
+            });
+        });
+        
+        // Task Cards - Open Task Content
+        document.querySelectorAll('.task-card').forEach(card => {
+            card.addEventListener('click', (e) => {
+                // Don't trigger if clicking on the start button
+                if (e.target.classList.contains('start-task-btn')) {
+                    const taskId = card.getAttribute('data-task');
+                    openTaskContent(taskId);
+                } else if (!e.target.classList.contains('start-task-btn')) {
+                    const taskId = card.getAttribute('data-task');
+                    openTaskContent(taskId);
+                }
+            });
+        });
+        
+        // Start Bonus Game
+        document.getElementById('startBonusGame').addEventListener('click', () => {
+            openTaskContent('bonus');
+            setupMemoryGame();
+        });
+        
+        // Close Task Buttons
+        document.querySelectorAll('.close-task-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const taskId = e.target.getAttribute('data-task');
+                closeTaskContent(taskId);
+            });
+        });
+        
+        // Open Task Content
+        function openTaskContent(taskId) {
+            taskContents[taskId].style.display = 'block';
+            document.body.style.overflow = 'hidden';
+            
+            // Scroll to top
+            taskContents[taskId].scrollTo(0, 0);
+        }
+        
+        // Close Task Content
+        function closeTaskContent(taskId) {
+            taskContents[taskId].style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+        
+        // Close task when clicking outside content
+        document.querySelectorAll('.task-content').forEach(content => {
+            content.addEventListener('click', (e) => {
+                if (e.target === content) {
+                    const taskId = content.id.replace('Content', '').replace('task', '');
+                    if (taskId === 'bonusGame') {
+                        closeTaskContent('bonus');
+                    } else {
+                        closeTaskContent(taskId);
+                    }
+                }
+            });
+        });
+        
+        /* TASK 1 IMPLEMENTATION - QUIZ GAME */
+        const quizQuestions = [
+            {
+                question: "What is the capital of France?",
+                options: ["London", "Berlin", "Paris", "Madrid"],
+                answer: 2
+            },
+            {
+                question: "Which language runs in a web browser?",
+                options: ["Java", "C", "Python", "JavaScript"],
+                answer: 3
+            },
+            {
+                question: "What does HTML stand for?",
+                options: [
+                    "Hypertext Markup Language",
+                    "Hypertext Machine Language",
+                    "Hypertext Marking Language",
+                    "Hyper Transfer Markup Language"
+                ],
+                answer: 0
+            },
+            {
+                question: "Which year was JavaScript launched?",
+                options: ["1996", "1995", "1994", "None of the above"],
+                answer: 1
+            }
+        ];
+        
+        let currentQuestion = 0;
+        let score = 0;
+        const gameMessage = document.getElementById('gameMessage');
+        const gameOptions = document.getElementById('gameOptions');
+        const startGameBtn = document.getElementById('startGame');
+        const gameScore = document.getElementById('gameScore');
+        
+        startGameBtn.addEventListener('click', startQuiz);
+        
+        function startQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            startGameBtn.style.display = 'none';
+            gameScore.textContent = '';
+            showQuestion();
+        }
+        
+        function showQuestion() {
+            const question = quizQuestions[currentQuestion];
+            gameMessage.textContent = question.question;
+            gameOptions.innerHTML = '';
+            gameOptions.style.display = 'grid';
+            
+            question.options.forEach((option, index) => {
+                const button = document.createElement('button');
+                button.classList.add('game-option');
+                button.textContent = option;
+                button.addEventListener('click', () => selectAnswer(index));
+                gameOptions.appendChild(button);
+            });
+        }
+        
+        function selectAnswer(selectedIndex) {
+            const question = quizQuestions[currentQuestion];
+            
+            if (selectedIndex === question.answer) {
+                score++;
+                gameMessage.textContent = "Correct! 🎉";
+            } else {
+                gameMessage.textContent = `Wrong! 😞 The correct answer was: ${question.options[question.answer]}`;
+            }
+            
+            currentQuestion++;
+            
+            if (currentQuestion < quizQuestions.length) {
+                setTimeout(showQuestion, 1500);
+            } else {
+                endQuiz();
+            }
+        }
+        
+        function endQuiz() {
+            gameMessage.textContent = `Quiz completed! Your score: ${score}/${quizQuestions.length}`;
+            gameOptions.style.display = 'none';
+            startGameBtn.style.display = 'block';
+            startGameBtn.textContent = 'RESTART QUIZ';
+            gameScore.textContent = `Final Score: ${score}/${quizQuestions.length}`;
+        }
+        
+        /* TASK 2 IMPLEMENTATION - NUMBER PATTERNS */
+        const patternSelect = document.getElementById('patternSelect');
+        const patternSize = document.getElementById('patternSize');
+        const generatePatternBtn = document.getElementById('generatePattern');
+        const patternOutput = document.getElementById('patternOutput');
+        
+        generatePatternBtn.addEventListener('click', generatePattern);
+        
+        function generatePattern() {
+            const patternType = patternSelect.value;
+            const size = parseInt(patternSize.value);
+            
+            if (size < 3 || size > 15) {
+                patternOutput.textContent = "Please enter a size between 3 and 15";
+                return;
+            }
+            
+            let pattern = '';
+            
+            switch (patternType) {
+                case 'pyramid':
+                    pattern = generatePyramid(size);
+                    break;
+                case 'diamond':
+                    pattern = generateDiamond(size);
+                    break;
+                case 'square':
+                    pattern = generateSquare(size);
+                    break;
+                case 'triangle':
+                    pattern = generateTriangle(size);
+                    break;
+                case 'numberPyramid':
+                    pattern = generateNumberPyramid(size);
+                    break;
+                default:
+                    pattern = "Select a valid pattern type";
+            }
+            
+            patternOutput.textContent = pattern;
+        }
+        
+        function generatePyramid(size) {
+            let pattern = '';
+            for (let i = 1; i <= size; i++) {
+                // Add spaces
+                pattern += ' '.repeat(size - i);
+                // Add stars
+                pattern += '*'.repeat(2 * i - 1);
+                pattern += '\n';
+            }
+            return pattern;
+        }
+        
+        function generateDiamond(size) {
+            let pattern = '';
+            // Upper half
+            for (let i = 1; i <= size; i++) {
+                pattern += ' '.repeat(size - i);
+                pattern += '*'.repeat(2 * i - 1);
+                pattern += '\n';
+            }
+            // Lower half
+            for (let i = size - 1; i >= 1; i--) {
+                pattern += ' '.repeat(size - i);
+                pattern += '*'.repeat(2 * i - 1);
+                pattern += '\n';
+            }
+            return pattern;
+        }
+        
+        function generateSquare(size) {
+            let pattern = '';
+            for (let i = 1; i <= size; i++) {
+                pattern += '*'.repeat(size);
+                pattern += '\n';
+            }
+            return pattern;
+        }
+        
+        function generateTriangle(size) {
+            let pattern = '';
+            for (let i = 1; i <= size; i++) {
+                pattern += '*'.repeat(i);
+                pattern += '\n';
+            }
+            return pattern;
+        }
+        
+        function generateNumberPyramid(size) {
+            let pattern = '';
+            for (let i = 1; i <= size; i++) {
+                // Add spaces
+                pattern += ' '.repeat(size - i);
+                // Add numbers
+                for (let j = 1; j <= i; j++) {
+                    pattern += j + ' ';
+                }
+                pattern += '\n';
+            }
+            return pattern;
+        }
+        
+        /* TASK 3 IMPLEMENTATION - CRUD OPERATIONS */
+        const taskTitle = document.getElementById('taskTitle');
+        const taskDescription = document.getElementById('taskDescription');
+        const taskIdInput = document.getElementById('taskId');
+        const addTaskBtn = document.getElementById('addTask');
+        const updateTaskBtn = document.getElementById('updateTask');
+        const cancelEditBtn = document.getElementById('cancelEdit');
+        const taskList = document.getElementById('taskList');
+        
+        let tasks = [];
+        let editingTaskId = null;
+        
+        addTaskBtn.addEventListener('click', addTask);
+        updateTaskBtn.addEventListener('click', updateTask);
+        cancelEditBtn.addEventListener('click', cancelEdit);
+        
+        function addTask() {
+            const title = taskTitle.value.trim();
+            const description = taskDescription.value.trim();
+            
+            if (!title) {
+                alert('Please enter a task title');
+                return;
+            }
+            
+            const newTask = {
+                id: Date.now(),
+                title,
+                description
+            };
+            
+            tasks.push(newTask);
+            renderTasks();
+            clearForm();
+        }
+        
+        function editTask(id) {
+            const task = tasks.find(task => task.id === id);
+            if (task) {
+                editingTaskId = task.id;
+                taskTitle.value = task.title;
+                taskDescription.value = task.description;
+                taskIdInput.value = task.id;
+                
+                addTaskBtn.style.display = 'none';
+                updateTaskBtn.style.display = 'block';
+                cancelEditBtn.style.display = 'block';
+            }
+        }
+        
+        function updateTask() {
+            const title = taskTitle.value.trim();
+            const description = taskDescription.value.trim();
+            
+            if (!title) {
+                alert('Please enter a task title');
+                return;
+            }
+            
+            const taskIndex = tasks.findIndex(task => task.id === editingTaskId);
+            
+            if (taskIndex !== -1) {
+                tasks[taskIndex] = {
+                    id: editingTaskId,
+                    title,
+                    description
+                };
+                
+                renderTasks();
+                cancelEdit();
+            }
+        }
+        
+        function cancelEdit() {
+            editingTaskId = null;
+            clearForm();
+            
+            addTaskBtn.style.display = 'block';
+            updateTaskBtn.style.display = 'none';
+            cancelEditBtn.style.display = 'none';
+        }
+        
+        function deleteTask(id) {
+            tasks = tasks.filter(task => task.id !== id);
+            renderTasks();
+            
+            if (editingTaskId === id) {
+                cancelEdit();
+            }
+        }
+        
+        function clearForm() {
+            taskTitle.value = '';
+            taskDescription.value = '';
+            taskIdInput.value = '';
+        }
+        
+        function renderTasks() {
+            if (tasks.length === 0) {
+                taskList.innerHTML = '<p>No tasks added yet. Add your first task above!</p>';
+                return;
+            }
+            
+            taskList.innerHTML = '';
+            
+            tasks.forEach(task => {
+                const taskElement = document.createElement('div');
+                taskElement.classList.add('task-item');
+                taskElement.innerHTML = `
+                    <div>
+                        <strong>${task.title}</strong>
+                        ${task.description ? `<p>${task.description}</p>` : ''}
+                    </div>
+                    <div class="task-actions">
+                        <button class="edit-btn" onclick="editTask(${task.id})">Edit</button>
+                        <button class="delete-btn" onclick="deleteTask(${task.id})">Delete</button>
+                    </div>
+                `;
+                taskList.appendChild(taskElement);
+            });
+        }
+        
+        // Make functions available globally for HTML onclick
+        window.editTask = editTask;
+        window.deleteTask = deleteTask;
+        
+        /* TASK 4 IMPLEMENTATION - TEMPERATURE CONVERTER */
+        const tempInput = document.getElementById('tempInput');
+        const conversionSelect = document.getElementById('conversionSelect');
+        const convertBtn = document.getElementById('convertTemp');
+        const tempResult = document.getElementById('tempResult');
+        
+        convertBtn.addEventListener('click', convertTemperature);
+        
+        function convertTemperature() {
+            const temp = parseFloat(tempInput.value);
+            
+            if (isNaN(temp)) {
+                tempResult.textContent = "Please enter a valid number";
+                return;
+            }
+            
+            const conversionType = conversionSelect.value;
+            let result;
+            
+            if (conversionType === 'cToF') {
+                // Celsius to Fahrenheit
+                result = (temp * 9/5) + 32;
+                tempResult.textContent = `${temp}°C = ${result.toFixed(2)}°F`;
+            } else {
+                // Fahrenheit to Celsius
+                result = (temp - 32) * 5/9;
+                tempResult.textContent = `${temp}°F = ${result.toFixed(2)}°C`;
+            }
+        }
+        
+        /* BONUS GAME IMPLEMENTATION - MEMORY GAME */
+        const memoryGameBoard = document.getElementById('memoryGameBoard');
+        const memoryScore = document.getElementById('memoryScore');
+        const restartMemoryGameBtn = document.getElementById('restartMemoryGame');
+        
+        let memoryCards = [];
+        let hasFlippedCard = false;
+        let lockBoard = false;
+        let firstCard, secondCard;
+        let matches = 0;
+        
+        restartMemoryGameBtn.addEventListener('click', setupMemoryGame);
+        
+        function setupMemoryGame() {
+            memoryCards = [];
+            matches = 0;
+            memoryScore.textContent = "Matches: 0/8";
+            memoryGameBoard.innerHTML = '';
+            
+            // Create pairs of cards
+            const emojis = ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼'];
+            const cards = [...emojis, ...emojis];
+            
+            // Shuffle cards
+            shuffleArray(cards);
+            
+            // Create card elements
+            cards.forEach((emoji, index) => {
+                const card = document.createElement('div');
+                card.classList.add('memory-card');
+                card.dataset.emoji = emoji;
+                card.dataset.index = index;
+                card.innerHTML = `
+                    <div class="card-front">?</div>
+                    <div class="card-back">${emoji}</div>
+                `;
+                card.addEventListener('click', flipCard);
+                memoryGameBoard.appendChild(card);
+                memoryCards.push(card);
+            });
+        }
+        
+        function flipCard() {
+            if (lockBoard) return;
+            if (this === firstCard) return;
+            
+            this.classList.add('flipped');
+            
+            if (!hasFlippedCard) {
+                // First click
+                hasFlippedCard = true;
+                firstCard = this;
+                return;
+            }
+            
+            // Second click
+            secondCard = this;
+            checkForMatch();
+        }
+        
+        function checkForMatch() {
+            const isMatch = firstCard.dataset.emoji === secondCard.dataset.emoji;
+            
+            if (isMatch) {
+                disableCards();
+                matches++;
+                memoryScore.textContent = `Matches: ${matches}/8`;
+                
+                if (matches === 8) {
+                    setTimeout(() => {
+                        alert('Congratulations! You won the memory game!');
+                    }, 500);
+                }
+            } else {
+                unflipCards();
+            }
+        }
+        
+        function disableCards() {
+            firstCard.removeEventListener('click', flipCard);
+            secondCard.removeEventListener('click', flipCard);
+            
+            resetBoard();
+        }
+        
+        function unflipCards() {
+            lockBoard = true;
+            
+            setTimeout(() => {
+                firstCard.classList.remove('flipped');
+                secondCard.classList.remove('flipped');
+                
+                resetBoard();
+            }, 1000);
+        }
+        
+        function resetBoard() {
+            [hasFlippedCard, lockBoard] = [false, false];
+            [firstCard, secondCard] = [null, null];
+        }
+        
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+        
+        // Style for memory game (added dynamically to keep all CSS together)
+        const memoryGameStyles = `
+            .memory-game-container {
+                text-align: center;
+            }
+            
+            .memory-game-controls {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 1rem;
+            }
+            
+            .memory-game-board {
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+                gap: 1rem;
+                max-width: 500px;
+                margin: 0 auto;
+            }
+            
+            .memory-card {
+                aspect-ratio: 1;
+                position: relative;
+                transform-style: preserve-3d;
+                transition: transform 0.5s;
+                cursor: pointer;
+                font-size: 2rem;
+            }
+            
+            .memory-card.flipped {
+                transform: rotateY(180deg);
+            }
+            
+            .card-front, .card-back {
+                position: absolute;
+                width: 100%;
+                height: 100%;
+                backface-visibility: hidden;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 10px;
+                box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+            }
+            
+            .card-front {
+                background: linear-gradient(45deg, #4facfe, #00f2fe);
+                color: white;
+            }
+            
+            .card-back {
+                background: white;
+                transform: rotateY(180deg);
+            }
+            
+            body.milky-way .card-front {
+                background: linear-gradient(45deg, #ff8a00, #e52e71);
+            }
+            
+            body.milky-way .card-back {
+                background: rgba(255, 255, 255, 0.1);
+                color: white;
+            }
+        `;
+        
+        const styleElement = document.createElement('style');
+        styleElement.textContent = memoryGameStyles;
+        document.head.appendChild(styleElement);
+        
+        // Initialize memory game when bonus content is opened
+        taskContents['bonus'].addEventListener('click', function(e) {
+            if (e.target === this && this.style.display === 'block') {
+                setupMemoryGame();
+            }
+        });
+    </script>
+</body>
+</html>
