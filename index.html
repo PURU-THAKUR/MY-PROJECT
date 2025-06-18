@@ -1,0 +1,1299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NMO AI - Ask Any Question, Upload Image & Take Your Answer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #00ff9d;
+            --secondary: #00b8ff;
+            --dark: #0a0a0a;
+            --dark-gray: #1a1a1a;
+            --light-gray: #2a2a2a;
+            --text: #f0f0f0;
+            --text-secondary: #b0b0b0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: var(--dark);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 20% 30%, rgba(0, 255, 157, 0.1) 0%, transparent 20%),
+                        radial-gradient(circle at 80% 70%, rgba(0, 184, 255, 0.1) 0%, transparent 20%);
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header Styles */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 3rem;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo span {
+            color: var(--secondary);
+        }
+
+        .auth-btn {
+            background: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            padding: 0.5rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .auth-btn:hover {
+            background: var(--primary);
+            color: var(--dark);
+            box-shadow: 0 0 15px var(--primary);
+        }
+
+        /* Main Menu Styles */
+        .main-menu {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex-grow: 1;
+            text-align: center;
+            transition: all 0.5s ease;
+        }
+
+        .main-menu h1 {
+            font-size: 2.8rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: gradientShift 5s ease infinite;
+            background-size: 200% 200%;
+            line-height: 1.3;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .main-menu h2 {
+            font-size: 1.3rem;
+            font-weight: 400;
+            margin-bottom: 3rem;
+            color: var(--text-secondary);
+            max-width: 700px;
+            line-height: 1.6;
+        }
+
+        .prompts-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            justify-content: center;
+            margin-bottom: 3rem;
+            max-width: 800px;
+        }
+
+        .prompt {
+            background: rgba(0, 255, 157, 0.1);
+            border: 1px solid rgba(0, 255, 157, 0.2);
+            border-radius: 8px;
+            padding: 0.8rem 1.2rem;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .prompt:hover {
+            background: rgba(0, 255, 157, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .prompt::before {
+            content: '✦';
+            margin-right: 0.5rem;
+            color: var(--primary);
+        }
+
+        .options {
+            display: flex;
+            gap: 2rem;
+            width: 100%;
+            max-width: 800px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .option-card {
+            background: var(--dark-gray);
+            border-radius: 15px;
+            padding: 2rem;
+            flex: 1;
+            min-width: 300px;
+            max-width: 400px;
+            border: 1px solid var(--light-gray);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .option-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            border-color: var(--primary);
+        }
+
+        .option-icon {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .option-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        .option-card p {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        /* Coding Expert Interface */
+        .coding-interface {
+            display: none;
+            flex-direction: column;
+            width: 100%;
+            flex-grow: 1;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .code-header h2 {
+            font-size: 1.8rem;
+            color: var(--primary);
+        }
+
+        .code-editor {
+            background: var(--dark-gray);
+            border-radius: 10px;
+            padding: 1.5rem;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .code-input-container {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .code-input {
+            flex-grow: 1;
+            background: var(--light-gray);
+            border: none;
+            border-radius: 8px;
+            padding: 1rem;
+            color: var(--text);
+            font-family: monospace;
+            font-size: 1rem;
+            resize: none;
+            min-height: 100px;
+        }
+
+        .search-btn {
+            background: var(--secondary);
+            color: var(--dark);
+            border: none;
+            padding: 0 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .search-btn:hover {
+            box-shadow: 0 0 15px var(--secondary);
+        }
+
+        .code-submit {
+            background: var(--primary);
+            color: var(--dark);
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            align-self: flex-end;
+            transition: all 0.3s ease;
+        }
+
+        .code-submit:hover {
+            box-shadow: 0 0 15px var(--primary);
+        }
+
+        .code-response {
+            margin-top: 2rem;
+            background: var(--light-gray);
+            border-radius: 8px;
+            padding: 1rem;
+            position: relative;
+            display: none;
+        }
+
+        .code-block {
+            background: #1e1e1e;
+            border-radius: 5px;
+            padding: 1rem;
+            font-family: monospace;
+            color: #f0f0f0;
+            overflow-x: auto;
+            position: relative;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--primary);
+            color: var(--dark);
+            border: none;
+            padding: 0.3rem 0.6rem;
+            border-radius: 5px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            opacity: 0.9;
+        }
+
+        /* Smart Assistant Interface */
+        .assistant-interface {
+            display: none;
+            flex-direction: column;
+            width: 100%;
+            flex-grow: 1;
+        }
+
+        .assistant-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .assistant-header h2 {
+            font-size: 1.8rem;
+            color: var(--primary);
+        }
+
+        .chat-container {
+            background: var(--dark-gray);
+            border-radius: 10px;
+            padding: 1.5rem;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-messages {
+            flex-grow: 1;
+            overflow-y: auto;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background: var(--light-gray);
+            border-radius: 8px;
+            min-height: 300px;
+        }
+
+        .message {
+            margin-bottom: 1rem;
+            padding: 0.8rem 1rem;
+            border-radius: 8px;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+
+        .user-message {
+            background: var(--primary);
+            color: var(--dark);
+            margin-left: auto;
+            border-bottom-right-radius: 0;
+        }
+
+        .ai-message {
+            background: var(--light-gray);
+            border: 1px solid #333;
+            margin-right: auto;
+            border-bottom-left-radius: 0;
+        }
+
+        .ai-message.final-response::after {
+            content: "If it's not clear or you want more detail, just ask again or re-upload!";
+            display: block;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 0.5rem;
+            padding-top: 0.5rem;
+            border-top: 1px dashed #444;
+        }
+
+        .upload-instruction {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .mobile-tip {
+            display: none;
+            background: rgba(0, 184, 255, 0.1);
+            border: 1px solid rgba(0, 184, 255, 0.3);
+            border-radius: 8px;
+            padding: 0.8rem;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .file-preview {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            display: none;
+            position: relative;
+        }
+
+        .file-preview img {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 5px;
+        }
+
+        .remove-file {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            border: none;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .chat-input-container {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .chat-input {
+            flex-grow: 1;
+            background: var(--light-gray);
+            border: none;
+            border-radius: 8px;
+            padding: 1rem;
+            color: var(--text);
+        }
+
+        .chat-input::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .file-upload-btn, .camera-btn, .mic-btn, .search-chat-btn {
+            background: var(--dark-gray);
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            padding: 0 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .file-upload-btn:hover, .camera-btn:hover, .mic-btn:hover, .search-chat-btn:hover {
+            background: var(--primary);
+            color: var(--dark);
+        }
+
+        .send-btn {
+            background: var(--primary);
+            color: var(--dark);
+            border: none;
+            padding: 0 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .send-btn:hover {
+            box-shadow: 0 0 15px var(--primary);
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        /* Camera Modal */
+        .camera-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .camera-content {
+            background: var(--dark-gray);
+            padding: 2rem;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 800px;
+        }
+
+        .camera-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .camera-header h3 {
+            color: var(--primary);
+        }
+
+        .close-camera {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .video-container {
+            width: 100%;
+            height: 400px;
+            background: #000;
+            margin-bottom: 1rem;
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        #camera-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .camera-controls {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .capture-btn, .cancel-camera {
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .capture-btn {
+            background: var(--primary);
+            color: var(--dark);
+            border: none;
+        }
+
+        .capture-btn:hover {
+            box-shadow: 0 0 15px var(--primary);
+        }
+
+        .cancel-camera {
+            background: transparent;
+            border: 1px solid var(--text-secondary);
+            color: var(--text-secondary);
+        }
+
+        .cancel-camera:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        /* Permission Modal for Microphone */
+        .permission-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .permission-content {
+            background: var(--dark-gray);
+            padding: 2rem;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+        }
+
+        .permission-content p {
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .allow-btn {
+            background: var(--primary);
+            color: var(--dark);
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .allow-btn:hover {
+            box-shadow: 0 0 15px var(--primary);
+        }
+
+        /* Back Button */
+        .back-btn {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--primary);
+            color: var(--dark);
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0, 255, 157, 0.3);
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .back-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 255, 157, 0.4);
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .main-menu h1 {
+                font-size: 2rem;
+            }
+
+            .main-menu h2 {
+                font-size: 1.1rem;
+            }
+
+            .prompts-container {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .prompt {
+                width: 100%;
+                text-align: center;
+            }
+
+            .options {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .option-card {
+                min-width: 100%;
+            }
+
+            .back-btn {
+                width: 50px;
+                height: 50px;
+                font-size: 1.2rem;
+                bottom: 1rem;
+                right: 1rem;
+            }
+
+            .mobile-tip {
+                display: block;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease forwards;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <a href="#" class="logo">NMO<span>AI</span></a>
+            <button class="auth-btn" id="authBtn">Login / Signup</button>
+        </header>
+
+        <!-- Main Menu -->
+        <section class="main-menu" id="mainMenu">
+            <h1>Ask Any Question, Upload Image & Take Your Answer</h1>
+            <h2>It might feel like magic, but it's real — just type or talk to get anything answered in seconds!</h2>
+            
+            <div class="prompts-container">
+                <div class="prompt">Write a resume for software job</div>
+                <div class="prompt">Upload error screenshot and get solution</div>
+                <div class="prompt">Explain this code: def binary_search(arr, x):</div>
+                <div class="prompt">Suggest good rap lyrics on love</div>
+                <div class="prompt">Show me trending reels captions</div>
+                <div class="prompt">How to crack NDA interview?</div>
+            </div>
+            
+            <div class="options">
+                <div class="option-card" id="codingExpert">
+                    <div class="option-icon">🧠</div>
+                    <h3>Coding Expert</h3>
+                    <p>Ask coding doubts, generate full code with copy buttons, and get instant answers.</p>
+                </div>
+                <div class="option-card" id="smartAssistant">
+                    <div class="option-icon">🤖</div>
+                    <h3>Smart Assistant</h3>
+                    <p>Ask anything about daily life, upload image/PDF/video, or use camera.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Coding Expert Interface -->
+        <section class="coding-interface" id="codingInterface">
+            <div class="code-header">
+                <h2>Coding Expert</h2>
+            </div>
+            <div class="code-editor">
+                <div class="code-input-container">
+                    <textarea class="code-input" id="codeInput" placeholder="Ask any coding question or describe what code you need..."></textarea>
+                    <button class="search-btn" id="codeSearchBtn">🔍</button>
+                </div>
+                <button class="code-submit" id="codeSubmit">Generate Code</button>
+                <div class="code-response" id="codeResponse">
+                    <div class="code-block">
+                        <button class="copy-btn" id="copyBtn">Copy</button>
+                        <pre><code id="generatedCode">// Your generated code will appear here</code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Smart Assistant Interface -->
+        <section class="assistant-interface" id="assistantInterface">
+            <div class="assistant-header">
+                <h2>Smart Assistant</h2>
+            </div>
+            <div class="chat-container">
+                <div class="chat-messages" id="chatMessages">
+                    <div class="message ai-message">
+                        Hello! I'm your NMO AI assistant. How can I help you today?
+                    </div>
+                </div>
+                
+                <div class="upload-instruction">
+                    Upload an image (screenshot, handwriting, diagram, etc.)<br>
+                    Our AI will analyze and give you instant answers, explanations, or suggestions!
+                </div>
+                
+                <div class="mobile-tip" id="mobileTip">
+                    Tip: Use mobile for faster image uploads and direct camera access!
+                </div>
+                
+                <div class="file-preview" id="filePreview">
+                    <button class="remove-file" id="removeFile">×</button>
+                    <div id="previewContent"></div>
+                </div>
+                
+                <div class="chat-input-container">
+                    <input type="file" id="fileInput" class="file-input" accept="image/*, .pdf, video/*">
+                    <button class="file-upload-btn" id="uploadBtn">📁</button>
+                    <button class="camera-btn" id="cameraBtn">📷</button>
+                    <button class="mic-btn" id="micBtn">🎤</button>
+                    <button class="search-chat-btn" id="searchChatBtn">🔍</button>
+                    <input type="text" class="chat-input" id="chatInput" placeholder="Ask me anything... (You can also upload an image or use voice!)">
+                    <button class="send-btn" id="sendBtn">Send</button>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Camera Modal -->
+    <div class="camera-modal" id="cameraModal">
+        <div class="camera-content">
+            <div class="camera-header">
+                <h3>Take a Photo</h3>
+                <button class="close-camera" id="closeCamera">&times;</button>
+            </div>
+            <div class="video-container">
+                <video id="camera-video" autoplay></video>
+            </div>
+            <div class="camera-controls">
+                <button class="cancel-camera" id="cancelCamera">Cancel</button>
+                <button class="capture-btn" id="captureBtn">Capture</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Permission Modal for Microphone -->
+    <div class="permission-modal" id="micPermissionModal">
+        <div class="permission-content">
+            <h3>Microphone Access</h3>
+            <p>To use voice input, please allow microphone access.<br>
+            This helps the assistant understand your question.<br>
+            Don't worry, your privacy is fully protected — no data is stored.</p>
+            <button class="allow-btn" id="allowMicBtn">Allow Microphone Access</button>
+        </div>
+    </div>
+
+    <!-- Permission Modal for Camera -->
+    <div class="permission-modal" id="cameraPermissionModal">
+        <div class="permission-content">
+            <h3>Camera Access</h3>
+            <p>To capture images, please allow camera access.<br>
+            This helps the assistant analyze visual content.<br>
+            Don't worry, your privacy is fully protected — no data is stored.</p>
+            <button class="allow-btn" id="allowCameraBtn">Allow Camera Access</button>
+        </div>
+    </div>
+
+    <!-- Back Button -->
+    <button class="back-btn" id="backBtn" style="display: none;">🔁</button>
+
+    <script>
+        // DOM Elements
+        const mainMenu = document.getElementById('mainMenu');
+        const codingInterface = document.getElementById('codingInterface');
+        const assistantInterface = document.getElementById('assistantInterface');
+        const codingExpertBtn = document.getElementById('codingExpert');
+        const smartAssistantBtn = document.getElementById('smartAssistant');
+        const backBtn = document.getElementById('backBtn');
+        const authBtn = document.getElementById('authBtn');
+        const codeSubmitBtn = document.getElementById('codeSubmit');
+        const codeSearchBtn = document.getElementById('codeSearchBtn');
+        const codeInput = document.getElementById('codeInput');
+        const codeResponse = document.getElementById('codeResponse');
+        const generatedCode = document.getElementById('generatedCode');
+        const copyBtn = document.getElementById('copyBtn');
+        const chatMessages = document.getElementById('chatMessages');
+        const chatInput = document.getElementById('chatInput');
+        const searchChatBtn = document.getElementById('searchChatBtn');
+        const sendBtn = document.getElementById('sendBtn');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const fileInput = document.getElementById('fileInput');
+        const filePreview = document.getElementById('filePreview');
+        const previewContent = document.getElementById('previewContent');
+        const removeFileBtn = document.getElementById('removeFile');
+        const cameraBtn = document.getElementById('cameraBtn');
+        const micBtn = document.getElementById('micBtn');
+        const cameraModal = document.getElementById('cameraModal');
+        const cameraVideo = document.getElementById('camera-video');
+        const captureBtn = document.getElementById('captureBtn');
+        const closeCamera = document.getElementById('closeCamera');
+        const cancelCamera = document.getElementById('cancelCamera');
+        const micPermissionModal = document.getElementById('micPermissionModal');
+        const cameraPermissionModal = document.getElementById('cameraPermissionModal');
+        const allowMicBtn = document.getElementById('allowMicBtn');
+        const allowCameraBtn = document.getElementById('allowCameraBtn');
+        const mobileTip = document.getElementById('mobileTip');
+        const prompts = document.querySelectorAll('.prompt');
+
+        // Current active section
+        let currentSection = 'main';
+        let currentUser = null;
+        let mediaStream = null;
+
+        // Initialize
+        function init() {
+            if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+                mobileTip.style.display = 'block';
+            }
+            setupEventListeners();
+        }
+
+        // Set up all event listeners
+        function setupEventListeners() {
+            // Navigation
+            codingExpertBtn.addEventListener('click', () => showSection('coding'));
+            smartAssistantBtn.addEventListener('click', () => showSection('assistant'));
+            backBtn.addEventListener('click', () => showSection('main'));
+            authBtn.addEventListener('click', handleAuth);
+
+            // Coding interface
+            codeSubmitBtn.addEventListener('click', handleCodeGeneration);
+            codeSearchBtn.addEventListener('click', handleCodeSearch);
+            copyBtn.addEventListener('click', copyCodeToClipboard);
+
+            // Chat interface
+            sendBtn.addEventListener('click', sendMessage);
+            searchChatBtn.addEventListener('click', handleChatSearch);
+            chatInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') sendMessage();
+            });
+
+            // File handling
+            uploadBtn.addEventListener('click', () => fileInput.click());
+            fileInput.addEventListener('change', handleFileUpload);
+            removeFileBtn.addEventListener('click', removeUploadedFile);
+
+            // Camera handling
+            cameraBtn.addEventListener('click', () => {
+                cameraPermissionModal.style.display = 'flex';
+            });
+            
+            micBtn.addEventListener('click', () => {
+                micPermissionModal.style.display = 'flex';
+            });
+
+            // Permission buttons
+            allowMicBtn.addEventListener('click', handleMicPermission);
+            allowCameraBtn.addEventListener('click', handleCameraPermission);
+            
+            // Close modals when clicking outside
+            window.addEventListener('click', (event) => {
+                if (event.target === cameraModal) {
+                    closeCameraModal();
+                }
+                if (event.target === micPermissionModal) {
+                    micPermissionModal.style.display = 'none';
+                }
+                if (event.target === cameraPermissionModal) {
+                    cameraPermissionModal.style.display = 'none';
+                }
+            });
+            
+            // Prompt suggestions
+            prompts.forEach(prompt => {
+                prompt.addEventListener('click', () => {
+                    if (currentSection === 'main') {
+                        showSection('assistant');
+                    }
+                    chatInput.value = prompt.textContent.replace('✦', '').trim();
+                    chatInput.focus();
+                });
+            });
+        }
+
+        // Show/Hide Sections
+        function showSection(section) {
+            mainMenu.style.display = 'none';
+            codingInterface.style.display = 'none';
+            assistantInterface.style.display = 'none';
+            backBtn.style.display = 'none';
+
+            switch(section) {
+                case 'main':
+                    mainMenu.style.display = 'flex';
+                    currentSection = 'main';
+                    break;
+                case 'coding':
+                    codingInterface.style.display = 'flex';
+                    backBtn.style.display = 'flex';
+                    currentSection = 'coding';
+                    // Reset code interface
+                    codeInput.value = '';
+                    codeResponse.style.display = 'none';
+                    break;
+                case 'assistant':
+                    assistantInterface.style.display = 'flex';
+                    backBtn.style.display = 'flex';
+                    currentSection = 'assistant';
+                    // Reset chat interface
+                    chatInput.value = '';
+                    filePreview.style.display = 'none';
+                    break;
+            }
+        }
+
+        // Handle authentication
+        function handleAuth() {
+            alert('Authentication would open here. For demo, you are logged in as guest.');
+            currentUser = {
+                email: 'guest@nmo.ai',
+                role: 'assistant'
+            };
+            authBtn.textContent = 'Guest User';
+        }
+
+        // Handle code generation
+        function handleCodeGeneration() {
+            const question = codeInput.value.trim();
+            if (!question) {
+                alert('Please enter a coding question');
+                return;
+            }
+
+            // Simulate loading
+            codeSubmitBtn.textContent = 'Generating...';
+            codeSubmitBtn.disabled = true;
+
+            setTimeout(() => {
+                const response = generateCodeResponse(question);
+                
+                generatedCode.textContent = response;
+                codeResponse.style.display = 'block';
+                codeResponse.classList.add('fade-in');
+                
+                codeSubmitBtn.textContent = 'Generate Code';
+                codeSubmitBtn.disabled = false;
+            }, 1500);
+        }
+
+        // Handle code search
+        function handleCodeSearch() {
+            const query = codeInput.value.trim();
+            if (!query) {
+                alert('Please enter a search query');
+                return;
+            }
+
+            // Simulate searching code examples
+            codeSubmitBtn.textContent = 'Searching...';
+            codeSubmitBtn.disabled = true;
+
+            setTimeout(() => {
+                const examples = searchCodeExamples(query);
+                
+                generatedCode.textContent = examples;
+                codeResponse.style.display = 'block';
+                codeResponse.classList.add('fade-in');
+                
+                codeSubmitBtn.textContent = 'Generate Code';
+                codeSubmitBtn.disabled = false;
+            }, 1000);
+        }
+
+        // Search code examples
+        function searchCodeExamples(query) {
+            const lowerQuery = query.toLowerCase();
+            
+            if (lowerQuery.includes('sort')) {
+                return `// Sorting examples\n// 1. Basic array sort\nconst arr = [3, 1, 4, 1, 5];\narr.sort(); // [1, 1, 3, 4, 5]\n\n// 2. Numeric sort\narr.sort((a, b) => a - b);\n\n// 3. Object property sort\nconst users = [{name: 'John', age: 30}, {name: 'Jane', age: 25}];\nusers.sort((a, b) => a.age - b.age);`;
+            } else if (lowerQuery.includes('filter')) {
+                return `// Filtering examples\n// 1. Basic array filter\nconst nums = [1, 2, 3, 4, 5];\nconst evens = nums.filter(n => n % 2 === 0); // [2, 4]\n\n// 2. Object array filter\nconst products = [{name: 'Book', price: 10}, {name: 'Pen', price: 2}];\nconst affordable = products.filter(p => p.price < 5);`;
+            } else {
+                return `// Search results for: ${query}\n// Try more specific terms like:\n// - "sort array"\n// - "filter objects"\n// - "async await example"\n\n// Here's a general code example:\nfunction ${query.toLowerCase().replace(/\s+/g, '_')}() {\n  // Implementation goes here\n  return "Results";\n}`;
+            }
+        }
+
+        // Generate simulated code response
+        function generateCodeResponse(question) {
+            const lowerQuestion = question.toLowerCase();
+            
+            if (lowerQuestion.includes('sort')) {
+                return `// ${question}\nfunction sortArray(arr) {\n  return arr.sort((a, b) => a - b);\n}\n\n// Example usage:\nconst numbers = [3, 1, 4, 1, 5, 9];\nconst sorted = sortArray(numbers);\nconsole.log(sorted); // [1, 1, 3, 4, 5, 9]`;
+            } else if (lowerQuestion.includes('binary search')) {
+                return `// ${question}\nfunction binarySearch(arr, target) {\n  let left = 0;\n  let right = arr.length - 1;\n\n  while (left <= right) {\n    const mid = Math.floor((left + right) / 2);\n    \n    if (arr[mid] === target) {\n      return mid; // Found the target\n    } else if (arr[mid] < target) {\n      left = mid + 1; // Search right half\n    } else {\n      right = mid - 1; // Search left half\n    }\n  }\n  \n  return -1; // Target not found\n}`;
+            } else {
+                return `// ${question}\nfunction solution() {\n  // Your code solution here\n  // This is a generated example\n  \n  // Replace with actual implementation\n  return "Your code result";\n}\n\n// Call the function\nconst result = solution();\nconsole.log(result);`;
+            }
+        }
+
+        // Copy code to clipboard
+        function copyCodeToClipboard() {
+            const code = generatedCode.textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                const originalText = copyBtn.textContent;
+                copyBtn.textContent = 'Copied!';
+                setTimeout(() => {
+                    copyBtn.textContent = originalText;
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy code:', err);
+                alert('Failed to copy code to clipboard');
+            });
+        }
+
+        // Handle chat search
+        function handleChatSearch() {
+            const query = chatInput.value.trim();
+            if (!query) {
+                alert('Please enter a search query');
+                return;
+            }
+
+            // Simulate searching chat history
+            sendBtn.textContent = 'Searching...';
+            sendBtn.disabled = true;
+
+            setTimeout(() => {
+                const results = searchChatHistory(query);
+                const aiMessage = addMessage(results, 'ai');
+                aiMessage.classList.add('final-response');
+                
+                sendBtn.textContent = 'Send';
+                sendBtn.disabled = false;
+            }, 800);
+        }
+
+        // Search chat history (simulated)
+        function searchChatHistory(query) {
+            const lowerQuery = query.toLowerCase();
+            const date = new Date().toLocaleString();
+            
+            if (lowerQuery.includes('resume')) {
+                return `Search results for "resume":\n1. Resume template for software jobs (shared on ${date})\n2. Tips for technical resume writing\n3. Common resume mistakes to avoid`;
+            } else if (lowerQuery.includes('error')) {
+                return `Search results for "error":\n1. Common JavaScript errors and solutions\n2. How to debug API errors\n3. Error handling best practices`;
+            } else {
+                return `Search results for "${query}":\n1. Related topic: ${query} examples\n2. Previous discussion about this topic\n3. Helpful resources`;
+            }
+        }
+
+        // Send chat message
+        function sendMessage() {
+            const message = chatInput.value.trim();
+            const hasFile = filePreview.style.display === 'block';
+            
+            if (!message && !hasFile) {
+                alert('Please enter a message or upload a file');
+                return;
+            }
+
+            // Add user message
+            if (message) {
+                addMessage(message, 'user');
+                chatInput.value = '';
+            }
+
+            // Handle file if present
+            if (hasFile) {
+                const fileType = previewContent.querySelector('img') ? 'image' : 
+                                 previewContent.querySelector('iframe') ? 'pdf' : 'video';
+                addMessage(`[Attached ${fileType}]`, 'user');
+                setTimeout(() => {
+                    filePreview.style.display = 'none';
+                }, 100);
+            }
+
+            // Simulate AI response
+            setTimeout(() => {
+                const response = generateAIResponse(message, hasFile);
+                const aiMessage = addMessage(response, 'ai');
+                aiMessage.classList.add('final-response');
+            }, 1000);
+        }
+
+        // Generate simulated AI response
+        function generateAIResponse(message, hasFile) {
+            if (hasFile) {
+                return "I've analyzed your image. It appears to be " + 
+                      (message.toLowerCase().includes('error') ? 
+                       "an error screenshot. Here's the solution: Check your syntax and ensure all variables are properly declared." : 
+                       "a diagram. The key elements suggest you should focus on the main components highlighted.");
+            }
+            
+            if (message.toLowerCase().includes('resume')) {
+                return "For a software job resume:\n1. Highlight your technical skills first\n2. List projects with technologies used\n3. Include relevant work experience\n4. Keep it to 1 page if possible\n5. Quantify achievements (e.g., 'Improved performance by 30%')";
+            } else if (message.toLowerCase().includes('error')) {
+                return "For error resolution:\n1. Check the error message carefully\n2. Search online for the exact error\n3. Verify your code syntax\n4. Check variable names and imports\n5. Try to isolate the problem";
+            } else {
+                const responses = [
+                    "I've processed your request. Here's what I found...",
+                    "Interesting question! Here's what I think...",
+                    "Based on my analysis, I'd recommend...",
+                    "Thanks for sharing that with me. Here's my response...",
+                    "I understand what you're asking. Here's the information you need..."
+                ];
+                return responses[Math.floor(Math.random() * responses.length)];
+            }
+        }
+
+        // Add message to chat
+        function addMessage(text, sender) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message', `${sender}-message`);
+            messageDiv.textContent = text;
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            return messageDiv;
+        }
+
+        // Handle file upload
+        function handleFileUpload(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            
+            if (file.type.startsWith('image/')) {
+                reader.onload = (event) => {
+                    previewContent.innerHTML = `<img src="${event.target.result}" alt="Uploaded Image">`;
+                    filePreview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            } else if (file.type === 'application/pdf') {
+                previewContent.innerHTML = `<iframe src="${URL.createObjectURL(file)}" style="width:100%; height:200px;"></iframe>`;
+                filePreview.style.display = 'block';
+            } else if (file.type.startsWith('video/')) {
+                previewContent.innerHTML = `<video controls style="width:100%;"><source src="${URL.createObjectURL(file)}" type="${file.type}"></video>`;
+                filePreview.style.display = 'block';
+            } else {
+                alert('Unsupported file type. Please upload an image, PDF, or video.');
+            }
+        }
+
+        // Remove uploaded file
+        function removeUploadedFile() {
+            filePreview.style.display = 'none';
+            fileInput.value = '';
+            previewContent.innerHTML = '';
+        }
+
+        // Handle microphone permission
+        async function handleMicPermission() {
+            try {
+                micPermissionModal.style.display = 'none';
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaStream = stream;
+                startVoiceRecording();
+            } catch (err) {
+                console.error("Microphone access error:", err);
+                alert("Could not access microphone. Please check permissions.");
+            }
+        }
+
+        // Handle camera permission
+        async function handleCameraPermission() {
+            try {
+                cameraPermissionModal.style.display = 'none';
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                mediaStream = stream;
+                cameraVideo.srcObject = stream;
+                cameraModal.style.display = 'flex';
+            } catch (err) {
+                console.error("Camera access error:", err);
+                alert("Could not access camera. Please check permissions.");
+            }
+        }
+
+        // Start voice recording (placeholder)
+        function startVoiceRecording() {
+            alert("Voice recording would start here. In a full implementation, this would use the Web Speech API.");
+            // Example of what you might do:
+            // const recognition = new webkitSpeechRecognition();
+            // recognition.onresult = function(event) {
+            //     const transcript = event.results[0][0].transcript;
+            //     chatInput.value = transcript;
+            // };
+            // recognition.start();
+        }
+
+        // Close camera modal and clean up
+        function closeCameraModal() {
+            cameraModal.style.display = 'none';
+            if (mediaStream) {
+                mediaStream.getTracks().forEach(track => track.stop());
+                mediaStream = null;
+                cameraVideo.srcObject = null;
+            }
+        }
+
+        // Capture photo from camera
+        function capturePhoto() {
+            const canvas = document.createElement('canvas');
+            canvas.width = cameraVideo.videoWidth;
+            canvas.height = cameraVideo.videoHeight;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(cameraVideo, 0, 0, canvas.width, canvas.height);
+            
+            previewContent.innerHTML = `<img src="${canvas.toDataURL('image/png')}" alt="Captured Photo">`;
+            filePreview.style.display = 'block';
+            
+            closeCameraModal();
+        }
+
+        // Initialize the app
+        init();
+    </script>
+</body>
+</html>
