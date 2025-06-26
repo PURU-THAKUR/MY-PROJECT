@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PhishX - Phishing Trap Detection</title>
+    <style>
+        :root {
+            --hacker-green: #00ff41;
+            --hacker-red: #ff0038;
+            --hacker-blue: #00b4ff;
+            --bg-dark: #0d0208;
+        }
+        
+        body {
+            font-family: 'Courier New', monospace;
+            background-color: var(--bg-dark);
+            color: var(--hacker-green);
+            margin: 0;
+            padding: 20px;
+            line-height: 1.5;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            border: 1px solid var(--hacker-green);
+            padding: 20px;
+            box-shadow: 0 0 15px var(--hacker-green);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .container::before {
+            content: "";
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            right: -10px;
+            bottom: -10px;
+            border: 2px dashed var(--hacker-green);
+            opacity: 0.3;
+            pointer-events: none;
+        }
+        
+        h1 {
+            text-align: center;
+            margin-top: 0;
+            text-shadow: 0 0 5px var(--hacker-green);
+            letter-spacing: 2px;
+        }
+        
+        .logo {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            animation: glow 2s infinite alternate;
+        }
+        
+        @keyframes glow {
+            from {
+                text-shadow: 0 0 5px var(--hacker-green);
+            }
+            to {
+                text-shadow: 0 0 15px var(--hacker-green), 0 0 20px var(--hacker-green);
+            }
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--hacker-blue);
+        }
+        
+        input {
+            width: 100%;
+            padding: 10px;
+            background-color: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--hacker-green);
+            color: white;
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+        }
+        
+        button {
+            background-color: transparent;
+            color: var(--hacker-green);
+            border: 1px solid var(--hacker-green);
+            padding: 12px 24px;
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-right: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        button:hover {
+            background-color: var(--hacker-green);
+            color: black;
+            box-shadow: 0 0 10px var(--hacker-green);
+        }
+        
+        .terminal {
+            background-color: rgba(0, 0, 0, 0.7);
+            border: 1px solid var(--hacker-green);
+            padding: 15px;
+            height: 200px;
+            overflow-y: auto;
+            margin-top: 20px;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+        }
+        
+        .terminal-line {
+            animation: type 0.1s steps(30);
+            margin-bottom: 5px;
+        }
+        
+        @keyframes type {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+        
+        .risk-indicator {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        
+        .risk-circle {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 3px solid var(--hacker-green);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(0, 255, 65, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(0, 255, 65, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 255, 65, 0); }
+        }
+        
+        .risk-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+        }
+        
+        .high-risk {
+            color: var(--hacker-red);
+            animation: danger-alert 0.5s infinite alternate;
+        }
+        
+        @keyframes danger-alert {
+            from { color: var(--hacker-red); }
+            to { color: white; }
+        }
+        
+        .medium-risk {
+            color: orange;
+        }
+        
+        .low-risk {
+            color: var(--hacker-green);
+        }
+        
+        .scan-effect {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, 
+                transparent 0%, 
+                rgba(0, 255, 65, 0.1) 50%, 
+                transparent 100%);
+            animation: scan 3s linear infinite;
+            pointer-events: none;
+            opacity: 0;
+        }
+        
+        @keyframes scan {
+            0% { transform: translateY(-100%); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(100%); opacity: 0; }
+        }
+        
+        .scan-active .scan-effect {
+            opacity: 1;
+        }
+        
+        .button-group {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        
+        .log-entry {
+            border-bottom: 1px dotted #333;
+            padding: 5px 0;
+            font-size: 0.9rem;
+        }
+        
+        .timestamp {
+            color: #666;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="main-container">
+        <div class="scan-effect"></div>
+        <div class="logo">PHISHX</div>
+        <h1>Phishing Trap Detection Simulator</h1>
+        
+        <div class="input-group">
+            <label for="url">Suspicious URL:</label>
+            <input type="text" id="url" placeholder="https://paypa1-login.com/verify">
+        </div>
+        
+        <div class="input-group">
+            <label for="email">Email Address:</label>
+            <input type="text" id="email" placeholder="user@amaazon.co">
+        </div>
+        
+        <div class="input-group">
+            <label for="password">Password (simulated check):</label>
+            <input type="text" id="password" placeholder="password123">
+        </div>
+        
+        <div class="button-group">
+            <button id="scan-btn">Scan for Traps</button>
+            <button id="report-btn" disabled>Report Threat</button>
+            <button id="view-logs">View Logs</button>
+        </div>
+        
+        <div class="risk-indicator">
+            <div class="risk-circle" id="risk-circle">
+                <div class="risk-value" id="risk-value">--%</div>
+            </div>
+        </div>
+        
+        <div class="terminal" id="terminal">
+            <div>PhishX Terminal v2.4.1</div>
+            <div>Initializing trap detection protocols...</div>
+            <div>Awaiting scan command...</div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlInput = document.getElementById('url');
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('password');
+            const scanBtn = document.getElementById('scan-btn');
+            const reportBtn = document.getElementById('report-btn');
+            const viewLogsBtn = document.getElementById('view-logs');
+            const terminal = document.getElementById('terminal');
+            const riskValue = document.getElementById('risk-value');
+            const riskCircle = document.getElementById('risk-circle');
+            const container = document.getElementById('main-container');
+            
+            // Load logs from localStorage or initialize empty array
+            let logs = JSON.parse(localStorage.getItem('phishx_logs')) || [];
+            
+            // Suspicious patterns
+            const urlPatterns = [
+                /login/i,
+                /verify/i,
+                /freegift/i,
+                /paypal/i,
+                /account/i,
+                /secure/i,
+                /bank/i,
+                /update/i,
+                /password/i,
+                /confirm/i
+            ];
+            
+            const emailPatterns = [
+                /paypa[^l]/i,
+                /amaazon/i,
+                /ebayy/i,
+                /micr0soft/i,
+                /appleid/i,
+                /netflixx/i,
+                /go0gle/i,
+                /facebok/i,
+                /twittter/i,
+                /linkedln/i
+            ];
+            
+            const weakPasswords = [
+                '123456', 'password', 'qwerty', '111111', 'abc123',
+                'admin', 'welcome', 'monkey', 'letmein', 'sunshine',
+                'password1', '12345678', '123123', '123456789', '1234567'
+            ];
+            
+            // Add log entry
+            function addLog(message, riskLevel = 0) {
+                const timestamp = new Date().toISOString();
+                logs.push({ timestamp, message, riskLevel });
+                if (logs.length > 50) logs.shift();
+                localStorage.setItem('phishx_logs', JSON.stringify(logs));
+            }
+            
+            // Display logs in terminal
+            function displayLogs() {
+                terminal.innerHTML = '';
+                addTerminalLine('PhishX Log History', true);
+                addTerminalLine('------------------', true);
+                
+                if (logs.length === 0) {
+                    addTerminalLine('No logs available', true);
+                    return;
+                }
+                
+                logs.slice().reverse().forEach(log => {
+                    const logEntry = document.createElement('div');
+                    logEntry.className = 'log-entry';
+                    logEntry.innerHTML = `<span class="timestamp">[${new Date(log.timestamp).toLocaleString()}]</span> ${log.message}`;
+                    terminal.appendChild(logEntry);
+                });
+            }
+            
+            // Add line to terminal with typing effect
+            function addTerminalLine(text, immediate = false) {
+                const line = document.createElement('div');
+                line.className = 'terminal-line';
+                line.textContent = text;
+                terminal.appendChild(line);
+                
+                if (!immediate) {
+                    line.style.width = '0';
+                    line.style.overflow = 'hidden';
+                    line.style.whiteSpace = 'nowrap';
+                    
+                    setTimeout(() => {
+                        line.style.width = '100%';
+                        line.style.whiteSpace = 'normal';
+                    }, 10);
+                }
+                
+                terminal.scrollTop = terminal.scrollHeight;
+            }
+            
+            // Scan for phishing traps
+            function scanForTraps() {
+                const url = urlInput.value.trim();
+                const email = emailInput.value.trim();
+                const password = passwordInput.value.trim();
+                
+                // Reset UI
+                terminal.innerHTML = '';
+                riskValue.textContent = '--%';
+                riskValue.className = 'risk-value';
+                reportBtn.disabled = true;
+                container.classList.add('scan-active');
+                
+                addTerminalLine('Initializing deep scan protocol...');
+                addTerminalLine(`Target URL: ${url || 'None'}`);
+                addTerminalLine(`Target Email: ${email || 'None'}`);
+                addTerminalLine('----------------------------------');
+                
+                let riskScore = 0;
+                let detectedIssues = [];
+                
+                // URL analysis
+                if (url) {
+                    addTerminalLine('Analyzing URL structure...');
+                    
+                    // Check for suspicious keywords
+                    urlPatterns.forEach(pattern => {
+                        if (pattern.test(url)) {
+                            const match = url.match(pattern)[0];
+                            detectedIssues.push(`Suspicious URL keyword: "${match}"`);
+                            riskScore += 10;
+                        }
+                    });
+                    
+                    // Check for HTTPS
+                    if (!url.startsWith('https://')) {
+                        detectedIssues.push('Connection not secure (missing HTTPS)');
+                        riskScore += 15;
+                    }
+                    
+                    // Check for IP address
+                    if (/\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/.test(url)) {
+                        detectedIssues.push('URL contains direct IP address (common in phishing)');
+                        riskScore += 20;
+                    }
+                    
+                    // Check for URL shortening
+                    if (/bit\.ly|goo\.gl|tinyurl|t\.co|ow\.ly/i.test(url)) {
+                        detectedIssues.push('URL shortening service detected (may hide malicious destination)');
+                        riskScore += 15;
+                    }
+                }
+                
+                // Email analysis
+                if (email) {
+                    addTerminalLine('Analyzing email domain...');
+                    
+                    // Check for lookalike domains
+                    emailPatterns.forEach(pattern => {
+                        if (pattern.test(email)) {
+                            detectedIssues.push(`Suspicious email domain: "${email.match(/@(.+)/)[1]}"`);
+                            riskScore += 15;
+                        }
+                    });
+                    
+                    // Check for free email providers
+                    if (/@gmail\.|@yahoo\.|@outlook\.|@hotmail\./i.test(email)) {
+                        detectedIssues.push('Personal email account detected (businesses rarely use these)');
+                        riskScore += 5;
+                    }
+                }
+                
+                // Password analysis
+                if (password) {
+                    addTerminalLine('Analyzing password strength...');
+                    
+                    // Check for weak passwords
+                    if (weakPasswords.includes(password.toLowerCase())) {
+                        detectedIssues.push(`Common/weak password detected: "${password}"`);
+                        riskScore += 25;
+                    }
+                    
+                    // Check password length
+                    if (password.length < 8) {
+                        detectedIssues.push('Password too short (minimum 8 characters recommended)');
+                        riskScore += 10;
+                    }
+                }
+                
+                // Calculate final risk percentage (capped at 95%)
+                const riskPercentage = Math.min(95, riskScore);
+                
+                // Display results
+                setTimeout(() => {
+                    addTerminalLine('----------------------------------');
+                    addTerminalLine('Scan complete. Detected issues:');
+                    
+                    if (detectedIssues.length === 0) {
+                        addTerminalLine('No obvious phishing indicators detected');
+                    } else {
+                        detectedIssues.forEach(issue => {
+                            addTerminalLine(`- ${issue}`);
+                        });
+                    }
+                    
+                    addTerminalLine('----------------------------------');
+                    addTerminalLine(`Calculated risk score: ${riskPercentage}%`);
+                    
+                    // Update risk indicator
+                    riskValue.textContent = `${riskPercentage}%`;
+                    
+                    if (riskPercentage > 70) {
+                        riskValue.className = 'risk-value high-risk';
+                        riskCircle.style.borderColor = 'var(--hacker-red)';
+                        riskCircle.style.animationName = 'pulse-danger';
+                    } else if (riskPercentage > 30) {
+                        riskValue.className = 'risk-value medium-risk';
+                        riskCircle.style.borderColor = 'orange';
+                    } else {
+                        riskValue.className = 'risk-value low-risk';
+                        riskCircle.style.borderColor = 'var(--hacker-green)';
+                    }
+                    
+                    // Enable report button
+                    reportBtn.disabled = false;
+                    container.classList.remove('scan-active');
+                    
+                    // Add to logs
+                    addLog(`Scan completed - Risk: ${riskPercentage}% - ${detectedIssues.length} issues found`, riskPercentage);
+                }, 1500);
+            }
+            
+            // Generate AI report
+            function generateAIReport() {
+                const currentRisk = parseInt(riskValue.textContent) || 0;
+                
+                const aiResponses = [
+                    `This site is ${currentRisk}% likely to be a phishing trap. Avoid entering sensitive information.`,
+                    `Our neural network detects ${currentRisk}% probability of credential harvesting. Exercise extreme caution.`,
+                    `Behavioral analysis suggests ${currentRisk}% match with known phishing patterns. Recommend immediate exit.`,
+                    `Heuristic scanning reveals ${currentRisk}% confidence level of malicious intent. Do not proceed.`,
+                    `Deep learning model classifies this as ${currentRisk}% dangerous. Strong indicators of fraud detected.`
+                ];
+                
+                const randomReport = aiResponses[Math.floor(Math.random() * aiResponses.length)];
+                
+                addTerminalLine('----------------------------------');
+                addTerminalLine('Generating AI threat assessment...');
+                setTimeout(() => {
+                    addTerminalLine(randomReport);
+                    addTerminalLine('Threat report added to security logs.');
+                    
+                    // Add to logs
+                    addLog(`AI Threat Report: ${randomReport}`, currentRisk);
+                }, 2000);
+            }
+            
+            // Event listeners
+            scanBtn.addEventListener('click', scanForTraps);
+            reportBtn.addEventListener('click', generateAIReport);
+            viewLogsBtn.addEventListener('click', displayLogs);
+            
+            // Initialize
+            addTerminalLine('System ready. Enter target information and click SCAN.', true);
+        });
+    </script>
+</body>
+</html>
